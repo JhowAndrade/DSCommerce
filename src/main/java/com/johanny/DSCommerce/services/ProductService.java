@@ -1,11 +1,13 @@
 package com.johanny.DSCommerce.services;
 
+import com.johanny.DSCommerce.dto.CategoryDTO;
 import com.johanny.DSCommerce.dto.ProductDTO;
+import com.johanny.DSCommerce.dto.ProductMinDTO;
+import com.johanny.DSCommerce.entities.Category;
 import com.johanny.DSCommerce.entities.Product;
 import com.johanny.DSCommerce.repositories.ProductRepository;
 import com.johanny.DSCommerce.services.exceptions.DatabaseException;
 import com.johanny.DSCommerce.services.exceptions.ResourceNotFoundException;
-import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service
 public class ProductService {
@@ -28,9 +32,9 @@ public class ProductService {
 
     }
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAll(String name, Pageable pageable) {
+    public Page<ProductMinDTO> findAll(String name, Pageable pageable) {
         Page<Product> result = repository.searchByName(name, pageable);
-        return result.map(x -> new ProductDTO(x)) ;
+        return result.map(x -> new ProductMinDTO(x));
 
     }
     @Transactional
@@ -74,6 +78,12 @@ public class ProductService {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setImgUrl(dto.getImgUrl());
+
+        entity.getCategories().clear();
+        for(CategoryDTO catDto : dto.getCategories()){
+            Category cat = new Category();
+            cat.setId(catDto.getId());
+            }
     }
 
 
